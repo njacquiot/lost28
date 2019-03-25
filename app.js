@@ -15,8 +15,12 @@ app.get('/', function(req, res) {
 	//res.end('<h1>Hello World by Nico</h1><p>How are things? Cool stuff this HEROKU! </p>');
 //});
 
-http.createServer(app).listen(3000, function(){
-	console.log('Express server listening on port ' + 3000);
+//http.createServer(app).listen(3000, function(){
+	//console.log('Express server listening on port ' + 3000);
+//});
+
+app.listen(port, function () {
+ console.log(`Example app listening on port !`);
 });
 
 //server.listen(port,() => {
