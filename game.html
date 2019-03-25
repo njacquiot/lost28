@@ -1,0 +1,85 @@
+<html>
+<head>
+
+<style>
+#status {
+	height: 150px;
+}
+</style>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script>
+
+$(document).ready( function() {
+
+//JSON Data
+	let data =
+	[
+	  {
+	    "world": "Harry Potter",
+	    "rooms": [
+	      "Chamber of secrets",
+	      "Forbidden forest",
+	      "Poudlard"
+	    ],
+			"score" : 0
+	  }
+	];
+
+	//Game is on
+	let gameIsRunning = true;
+
+	//One world and a random room to start
+	$('#status').append( 'Your are in ' + data[0].world + ' world');
+
+
+	// Save string to localStorage
+	localStorage.setItem('myWorld',data[0].world);
+
+	let rand = Math.floor(Math.random()*3);
+	localStorage.setItem('myRoom',data[0].rooms[rand]);
+	$('#status').append('<br/>You are now in the room ' + data[0].rooms[rand] + ' and you have ' + data[0].score + ' point');
+
+
+		//Confirm your character
+		$('#enterBtn').click( ()=>{
+			localStorage.setItem('myChar', $('#userName').val().toUpperCase());
+			$('#character').append('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
+			 //$('#userName').val() = null;
+		});
+
+		$('#userName').keyup(  function(e){
+			if (e.keyCode == 13){
+				localStorage.setItem('myChar', $('#userName').val().toUpperCase());
+				$('#character').append('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
+				 //$('#userName').val() = "";
+			}
+		});
+
+
+
+});
+
+</script>
+
+<title>Lost Game</title>
+</head>
+<body>
+	<h1>Lost Game</h1>
+
+  <div id = "head-game">
+    <p>Welcome to the game</p>
+		<div id ="status"></div>
+  </div>
+
+	<div id = "character">
+		<p>You can now enter your name</p>
+		<input type="text" id="userName"></input>
+		<button type="button" id="enterBtn">ENTER</button>
+	</div>
+
+
+
+</body>
+</html>
