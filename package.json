@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Nico first server test",
   "main": "app.js",
-  "dependencies": {
-    "express": "~4.11.1"
-  },
   "scripts": {
     "start": "node app.js"
   },
@@ -18,5 +15,8 @@
   "bugs": {
     "url": ""
   },
-  "homepage": ""
+  "homepage": "",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
 }
