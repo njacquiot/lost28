@@ -10,5 +10,10 @@ module.exports = function(app) {
 		res.sendFile('jquery.min.js' , { root : __dirname});
 	});
 
+	app.get('/data.json', function(req, res) {
+		// Send a plain text response
+		res.sendFile('data.json' , { root : __dirname});
+	});
+
 
 };

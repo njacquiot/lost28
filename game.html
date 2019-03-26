@@ -27,8 +27,34 @@ $(document).ready( function() {
 	  }
 	];
 
+	let question =
+	[
+		{
+			"verbs": [
+				"DESCRIBE",
+				"MOVE FORWARD",
+				"MOVE BACKWARD",
+				"OPEN",
+				"FIND",
+				"READ",
+			],
+			"nouns":[
+				"ROOM",
+				"BOX",
+				"OBJECT",
+				"DOOR",
+				"BOOK"
+			]
+		}
+	]
+
 	//Game is on
 	let gameIsRunning = true;
+
+	$.getJSON( "data.json", function( data2 ) {
+		//Ne fais rein ?
+	});
+
 
 	//One world and a random room to start
 	$('#status').append( 'Your are in ' + data[0].world + ' world');
@@ -45,18 +71,42 @@ $(document).ready( function() {
 		//Confirm your character
 		$('#enterBtn').click( ()=>{
 			localStorage.setItem('myChar', $('#userName').val().toUpperCase());
-			$('#character').append('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
-			 //$('#userName').val() = null;
+			$('#character').html('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
+			$('#instructions').show();
 		});
 
 		$('#userName').keyup(  function(e){
 			if (e.keyCode == 13){
 				localStorage.setItem('myChar', $('#userName').val().toUpperCase());
-				$('#character').append('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
-				 //$('#userName').val() = "";
+				$('#character').html('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
+				$('#instructions').show();
+
+
 			}
 		});
 
+		$('#understand').click( ()=>{
+
+			$('#understand').hide();
+
+			$("#dumbledore").append("Hello " + localStorage.getItem('myChar') + ", I'm Dumbledore nice to meet you. " + localStorage.getItem('myRoom') + " is a huge place, hope you won't be lost ! How can I help you ?");
+			$('#questions').show();
+
+			$("#send").click( ()=>{
+				if ($('#Verb').val().toUpperCase() == question[0].verbs[0]){
+					$('#game').append("</br>Well, I will tell you what I see !");
+						if ($('#Noun').val().toUpperCase() == question[0].nouns[0]){
+							if(localStorage.getItem('myRoom') == data[0].rooms[2]){
+								$('#game').append("</br>You are in a big room, there are lot's of table and chair, you seem to be in a classroom, I see lot's of painting on the wall, I see two doors one in front and one behind.</br>");
+								$('#Verb').val('');
+								$('#Noun').val('');
+							}
+						}
+				}
+			});
+
+
+		});
 
 
 });
@@ -77,6 +127,34 @@ $(document).ready( function() {
 		<p>You can now enter your name</p>
 		<input type="text" id="userName"></input>
 		<button type="button" id="enterBtn">ENTER</button>
+	</div>
+	<div id ="instructions"  style="display: none">
+
+	</br></br>The game can start !! Instructions are simple : </br></br>
+<p>	You are in your room but there are other rooms and you have to undestand how you can go out ! The goal is to understand your room in order to leave, the more you understand the more points you will have !! </br>
+	You can talk to Dumbledore with a simple combinaison of a <b>Noun</b> and a <b>Verb</b> that he can understand, Enjoy :)</br></p>
+<button type="button" id="understand">UNDERSTAND</button>
+
+
+
+	</div>
+
+	<div id ="dumbledore"></div>
+
+	<div id = "Poudlard">
+
+		<div id = "room">
+
+		</div>
+
+	</div>
+
+
+	<div id ="game"></div>
+	<div id = "questions" style="display: none">
+	<input id ="Verb" type ="text" placeholder="Verb"/>
+	<input id ="Noun" type="text" placeholder="Noun"/>
+	<button id ="send">Send</button>
 	</div>
 
 

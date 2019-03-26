@@ -1,0 +1,11 @@
+[
+  {
+    "world": "Harry Potter",
+    "rooms": [
+      "Chamber of secrets",
+      "Forbidden forest",
+      "Poudlard"
+    ],
+    "score" : 0
+  }
+];
