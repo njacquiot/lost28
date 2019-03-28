@@ -13,6 +13,7 @@ module.exports = function(app) {
 	app.get('/data.json', function(req, res) {
 		// Send a plain text response
 		res.sendFile('data.json' , { root : __dirname});
+		console.log("found");
 	});
 
 
