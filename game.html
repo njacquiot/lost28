@@ -92,6 +92,10 @@ let Poudlard =
 		// Save string to localStorage
 		localStorage.setItem('myWorld',data[0].world);
 
+		localStorage.setItem('Light', 'off');
+		localStorage.setItem('Wand', -1);
+		localStorage.setItem('Light_switch', -1);
+
 		let rand = Math.floor(Math.random()*3);
 		//localStorage.setItem('myRoom',data[0].rooms[rand]);
 		localStorage.setItem('myRoom',data[0].rooms[2]); //TT le temps Poudlard pour l'instant
@@ -125,19 +129,30 @@ let Poudlard =
 				$("#send").click( ()=>{
 
 					switch ($('#Verb').val().toUpperCase()) {
+
+
 						case data[1].verbs[0]: //describe
 							$('#game').append("</br>Well, I will tell you what I see !");
 							switch ($('#Noun').val().toUpperCase()) {
 								case data[1].nouns[0]:
-										$('#game').append(data[2].Poudlard_description);
+									if(localStorage.getItem('Light') == "on"){
+										$('#game').append(data[2].Poudlard_description[1]);
+									}else{
+										$('#game').append(data[2].Poudlard_description[0]);
+									}
 									break;
 								case data[1].nouns[1]:
-										$('#game').append(data[2].Wand_description[0]);
+								if (localStorage.getItem('MyWand') == "wand"){
+									$('#game').append(data[2].Wand_description[localStorage.getItem("Wand")]);
+								}else{
+									$('#game').append("</br>I don't know if there is a wand here ...");
+								}
 									break;
 								case data[1].nouns[2]:
 										$('#game').append(data[2].Box);
 									break;
 								case data[1].nouns[3]:
+
 										$('#game').append(data[2].Key);
 									break;
 								case data[1].nouns[4]:
@@ -156,48 +171,136 @@ let Poudlard =
 									$('#game').append("</br>Sorry I don't undestand what you want");
 
 							}
+							break;
+
+
+						case data[1].verbs[1]: //Say
+							switch ($('#Noun').val().toUpperCase()) {
+								case data[1].nouns[9]:
+									if(localStorage.getItem("Mybox") == "box"){
+											$('#game').append("</br>Wow it works you have open the box... OMG this is a... a Boggart, you have to fight or you will lose ! Take your chance");
+											localStorage.setItem("Boggart", "on");
+									}else{
+											$('#game').append($('#Noun').val() + "Mmmh nothing happened");
+									}
+									break;
+								case data[1].nouns[10]:
+									if (localStorage.getItem("Boggart") == "on"){
+										$('#game').append("</br>Ahahahaha It's a clown now :D Oh he gives you a key, you should take it");
+										localStorage.setItem("Boggart", "win");
+									}else{
+											$('#game').append($('#Noun').val() + "Mmmh nothing happened");
+									}
+
+							default :
+									$('#game').append("</br>"+$('#Noun').val());
+							break;
+						}
+
+
+						case data[1].verbs[2]: //take
+							switch ($('#Noun').val().toUpperCase()) {
+
+								case data[1].nouns[1] : //wand
+									if(	localStorage.getItem("Wand") == 0 || localStorage.getItem("Wand") == 1){
+										localStorage.setItem("Mywand", "wand");
+										$('#game').append("</br>Alright I took the "+ $('#Noun').val() + ", you can use it whenever you want");
+									}else{
+										$('#game').append("</br>I don't know if there is a wand here ...");
+									}
+								break;
+								case data[1].nouns[2]: //Box
+									if(localStorage.getItem("Box") == "on"){
+										localStorage.setItem("Mybox", "box");
+										$('#game').append("</br>Alright I took the "+ $('#Noun').val() + ", you can use it whenever you want");
+									}else{
+										$('#game').append("</br>I don't know where the box is .. ");
+									}
+									break;
+								case data[1].nouns[3]: //KEY
+									if(localStorage.getItem("Boggart")== "win"){
+										$('#game').append("</br>Alright I took the "+ $('#Noun').val() + ", you can use it whenever you want");
+										localStorage.setItem("Mykey", "key");
+									}else{
+										$('#game').append("</br>I don't know where the key is .. ");
+									}
+									break;
+								}
+							break;
+
+						case data[1].verbs[3]: //use No need ?
+						/*
+							case data[1].nouns[1] : //wand
+								if(	localStorage.getItem("Mywand") == "wand"){
+									$('#game').append("</br>Ready !! Try a spell !");
+								}
+								break;
+
+							case data[1].nouns[3]: //KEY
+								if(	localStorage.getItem("Mykey") == "key"){
+
+								}*/
+							break;
+
+
+						case data[1].verbs[4]: //open
+							switch ($('#Noun').val().toUpperCase()) {
+
+								case data[1].nouns[2]: //Box
+									if(localStorage.getItem("Mybox") == "box"){
+										$('#game').append("</br>The " + $('#Noun').val() + " is close.. I think tou need a speel to open it, I hope you have a wand");
+									}else{
+										$('#game').append("</br>You don't have any Box in your objects");
+									}
+									break;
+
+								case data[1].nouns[4]: //The DOOR
+									if (localStorage.getItem("Mykey")== "key"){
+										$('#game').append("</br>You did it !!!! Congratulation you open figure out how to leave the room :) See you in another world :)");
+									}else{
+										$('#game').append("</br>The door is locked");
+									}
+									break;
+							}
+
 
 							break;
-						case data[1].verbs[1]: //Say
-							$('#game').append("</br>"+$('#Noun').val());
-							break;
-						case data[1].verbs[2]: //take
-							$('#game').append("</br>Alright I took the "+ $('#Noun').val() + "you can use it whenever you want");
-							break;
-						case data[1].verbs[3]: //use
-							$('#game').append("</br>Let's try !");
-							break;
-						case data[1].verbs[4]: //open
-							$('#game').append("</br>The " + $('#Noun').val() + "is now open");
-							break;
+
+
 						case data[1].verbs[5]: //find
 
 							let rand = Math.floor(Math.random()*3);
 							switch ($('#Noun').val().toUpperCase()) {
 								case data[1].nouns[1]: //Wand
 									if(rand == 1){
-										$('#game').append("</br>Oh interesting you are really lucky I found a " + $('#Noun').val());
-										let rand = Math.floor(Math.random()*2);
-										if (rand == 1){
-											localStorage.setItem("Wand", rand);
-											$('#game').append(data[2].Wand_description[0]);
-										}else{
-											$('#game').append(data[2].Wand_description[1]);
-										}
+										$('#game').append("</br>Oh interesting you are really lucky I found a " + $('#Noun').val() + " You should take it !!");
+										let rand = Math.floor(Math.random());
+										localStorage.setItem("Wand", rand);
+										$('#game').append(data[2].Wand_description[rand]);
 									}else{
 										$('#game').append("</br>Sorry I didn't find any wand");
 									}
 									break;
 								case data[1].nouns[2]: //Box
 									if (localStorage.getItem('Light') == "on"){
-										$('#game').append("</br>Oh interesting I found a blabla" + $('#Noun').val());
+										localStorage.setItem("Box", "on");
+										$('#game').append("</br>Oh interesting I found a " + $('#Noun').val()+ " You should take it !!");
 									}else{
 										$('#game').append("</br>Sorry I don't see any "+ $('#Noun').val());
 									}
 									break;
-								case data[1].nouns[6]: //Light
 
-									localStorage.setItem('Light', 'find');
+								case data[1].nouns[4]: //The DOOR
+									if (localStorage.getItem('Light') == "on"){
+										$('#game').append("</br>The door is in the end of the room");
+									}else{
+										$('#game').append("</br>Ther is no issues");
+									}
+									break;
+
+								case data[1].nouns[8]: //Light switch
+
+									localStorage.setItem('Light_switch', 'find');
 									$('#game').append("</br>Oh interesting you are really lucky I found the " + $('#Noun').val());
 									break;
 								default:
@@ -205,25 +308,35 @@ let Poudlard =
 
 							}
 							break;
+
+
 						case data[1].verbs[6]: //read
 							$('#game').append("</br>One second, I took my glasses... It says : ");
 							break;
+
+
 						case data[1].verbs[7]: //move forward
 							$('#game').append("</br>Let's go Forward !");
 							break;
+
+
 						case data[1].verbs[8]: //move backward
 							$('#game').append("</br>Half tour !");
 							break;
+
+
 						case data[1].verbs[9]: //switch on
-							if(localStorage.getItem('Light') == "find"){
+							if(localStorage.getItem('Light_switch') == "find"){
 								localStorage.setItem('Light', 'on');
 								$('#game').append("</br>Perfect I see correctly now !");
 							}else{
-									$('#game').append('</br>Sorry but I don\'t know where the light is ... ');
+									$('#game').append('</br>Sorry but I don\'t know where the light switch is ... ');
 							}
 							break;
+
+
 						case data[1].verbs[10]: //switch off
-							if(localStorage.getItem('Light') == "find"){
+							if(localStorage.getItem('Light_switch') == "find"){
 								localStorage.setItem('Light', 'off');
 								$('#game').append("</br>Oh we don't see anything now !");
 							}else{
