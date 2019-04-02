@@ -13,7 +13,8 @@
 <script>
 
 $(document).ready( function() {
-
+	$.getJSON( "/data.json", function(data) {
+/*
 //JSON Data
 	let data =
 	[
@@ -59,7 +60,7 @@ let Poudlard =
 		{
 			"description" : "</br>You are in a bigest room of the castle, it seems to be in a classroom,"+
 			" I see lot's of painting on the wall, I see one door behind you but I can't see the bottom of the room the light is off."+
-			" There are tables with teaching books, papers and potions",			"decription" : "You are in a bigest room of the castle, it seems to be in a classroom,",
+			" There are tables with teaching books, papers and potions"
 		}
 
 ];
@@ -70,128 +71,179 @@ let Poudlard =
 		}
 	];
 
+*/
+
+		//Game is on
+		let gameIsRunning = true;
+
+		for(i = 0; i<data[1].verbs.length; i++){
+			$('#useVerb').append("<li>"+data[1].verbs[i]+"</li>");
+		}
+
+		for(i = 0; i<data[1].nouns.length; i++){
+			$('#useNoun').append("<li>"+data[1].nouns[i]+"</li>");
+		}
 
 
-	//Game is on
-	let gameIsRunning = true;
-
-	for(i = 0; i<question[0].verbs.length; i++){
-		$('#useVerb').append("<li>"+question[0].verbs[i]+"</li>");
-	}
-
-	for(i = 0; i<question[0].nouns.length; i++){
-		$('#useNoun').append("<li>"+question[0].nouns[i]+"</li>");
-	}
+		//One world and a random room to start
+		$('#status').append( 'Your are in ' + data[0].world + ' world');
 
 
-	$.getJSON( "/data.json", function( data2 ) {
-		console.log("3lkjfqdslkjfdskl" + data2);
-	});
+		// Save string to localStorage
+		localStorage.setItem('myWorld',data[0].world);
+
+		let rand = Math.floor(Math.random()*3);
+		//localStorage.setItem('myRoom',data[0].rooms[rand]);
+		localStorage.setItem('myRoom',data[0].rooms[2]); //TT le temps Poudlard pour l'instant
+		$('#status').append('<br/>You are now in the room ' + data[0].rooms[rand] + ' and you have ' + data[0].score + ' point');
 
 
-	//One world and a random room to start
-	$('#status').append( 'Your are in ' + data[0].world + ' world');
-
-
-	// Save string to localStorage
-	localStorage.setItem('myWorld',data[0].world);
-
-	let rand = Math.floor(Math.random()*3);
-	//localStorage.setItem('myRoom',data[0].rooms[rand]);
-	localStorage.setItem('myRoom',data[0].rooms[2]); //TT le temps Poudlard pour l'instant
-	$('#status').append('<br/>You are now in the room ' + data[0].rooms[rand] + ' and you have ' + data[0].score + ' point');
-
-
-		//Confirm your character
-		$('#enterBtn').click( ()=>{
-			localStorage.setItem('myChar', $('#userName').val().toUpperCase());
-			$('#character').html('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
-			$('#instructions').show();
-		});
-
-		$('#userName').keyup(  function(e){
-			if (e.keyCode == 13){
+			//Confirm your character
+			$('#enterBtn').click( ()=>{
 				localStorage.setItem('myChar', $('#userName').val().toUpperCase());
 				$('#character').html('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
 				$('#instructions').show();
+			});
 
-
-			}
-		});
-
-		$('#understand').click( ()=>{
-
-			$('#understand').hide();
-
-			$("#dumbledore").append("Hello " + localStorage.getItem('myChar') + ", I'm Dumbledore nice to meet you. " + localStorage.getItem('myRoom') + " is a huge place, hope you won't be lost ! How can I help you ?");
-			$('#questions').show();
-
-			$("#send").click( ()=>{
-
-				switch ($('#Verb').val().toUpperCase()) {
-					case question[0].verbs[0]: //describe
-						$('#game').append("</br>Well, I will tell you what I see !");
-						switch ($('#Noun').val().toUpperCase()) {
-							case question[0].nouns[0]:
-									$('#game').append(Poudlard[0].description);
-								break;
-							default:
-								$('#game').append("</br>Sorry I don't undestand what you want");
-
-						}
-
-						break;
-					case question[0].verbs[1]: //Say
-						$('#game').append("</br>"+$('#Noun').val());
-						break;
-					case question[0].verbs[2]: //take
-						$('#game').append("</br>Alright I took the "+ $('#Noun').val() + "you can use it whenever you want");
-						break;
-					case question[0].verbs[3]: //use
-						$('#game').append("</br>Let's try !");
-						break;
-					case question[0].verbs[4]: //open
-						$('#game').append("</br>The " + $('#Noun').val() + "is now open");
-						break;
-					case question[0].verbs[5]: //find
-						$('#game').append("</br>Oh interesting I found the " + $('#Noun').val());
-						break;
-					case question[0].verbs[6]: //read
-						$('#game').append("</br>One second, I took my glasses... It says : ");
-						break;
-					case question[0].verbs[7]: //move forward
-						$('#game').append("</br>Let's go Forward !");
-						break;
-					case question[0].verbs[8]: //move backward
-						$('#game').append("</br>Half tour !");
-						break;
-					default:
-						$('#game').append("</br>Sorry I don't undestand your verb");
-
-
+			$('#userName').keyup(  function(e){
+				if (e.keyCode == 13){
+					localStorage.setItem('myChar', $('#userName').val().toUpperCase());
+					$('#character').html('Welcome to ' + localStorage.getItem('myRoom') + " " + localStorage.getItem('myChar'));
+					$('#instructions').show();
 
 
 				}
-				/*
-				if ($('#Verb').val().toUpperCase() == question[0].verbs[0]){
-					$('#game').append("</br>Well, I will tell you what I see !");
-
-
-
-					if ($('#Noun').val().toUpperCase() == question[0].nouns[0]){
-						if(localStorage.getItem('myRoom') == data[0].rooms[2]){
-							$('#game').append("</br>You are in a big room, there are lot's of table and chair, you seem to be in a classroom, I see lot's of painting on the wall, I see two doors one in front and one behind.</br>");
-							$('#Verb').val('');
-							$('#Noun').val('');
-						}
-					}
-				}*/
 			});
 
+			$('#understand').click( ()=>{
 
-		});
+				$('#understand').hide();
+
+				$("#dumbledore").append("Hello " + localStorage.getItem('myChar') + ", I'm Dumbledore nice to meet you. " + localStorage.getItem('myRoom') + " is a huge place, hope you won't be lost ! How can I help you ?");
+				$('#questions').show();
+
+				$("#send").click( ()=>{
+
+					switch ($('#Verb').val().toUpperCase()) {
+						case data[1].verbs[0]: //describe
+							$('#game').append("</br>Well, I will tell you what I see !");
+							switch ($('#Noun').val().toUpperCase()) {
+								case data[1].nouns[0]:
+										$('#game').append(data[2].Poudlard_description);
+									break;
+								case data[1].nouns[1]:
+										$('#game').append(data[2].Wand_description[0]);
+									break;
+								case data[1].nouns[2]:
+										$('#game').append(data[2].Box);
+									break;
+								case data[1].nouns[3]:
+										$('#game').append(data[2].Key);
+									break;
+								case data[1].nouns[4]:
+										$('#game').append(data[2].Door);
+									break;
+								case data[1].nouns[5]:
+										$('#game').append(data[2].Book[0]);
+									break;
+								case data[1].nouns[6]:
+										$('#game').append(data[2].Light);
+									break;
+								case data[1].nouns[7]:
+										$('#game').append(data[2].Painting);
+									break;
+								default:
+									$('#game').append("</br>Sorry I don't undestand what you want");
+
+							}
+
+							break;
+						case data[1].verbs[1]: //Say
+							$('#game').append("</br>"+$('#Noun').val());
+							break;
+						case data[1].verbs[2]: //take
+							$('#game').append("</br>Alright I took the "+ $('#Noun').val() + "you can use it whenever you want");
+							break;
+						case data[1].verbs[3]: //use
+							$('#game').append("</br>Let's try !");
+							break;
+						case data[1].verbs[4]: //open
+							$('#game').append("</br>The " + $('#Noun').val() + "is now open");
+							break;
+						case data[1].verbs[5]: //find
+
+							let rand = Math.floor(Math.random()*3);
+							switch ($('#Noun').val().toUpperCase()) {
+								case data[1].nouns[1]: //Wand
+									if(rand == 1){
+										$('#game').append("</br>Oh interesting you are really lucky I found a " + $('#Noun').val());
+										let rand = Math.floor(Math.random()*2);
+										if (rand == 1){
+											localStorage.setItem("Wand", rand);
+											$('#game').append(data[2].Wand_description[0]);
+										}else{
+											$('#game').append(data[2].Wand_description[1]);
+										}
+									}else{
+										$('#game').append("</br>Sorry I didn't find any wand");
+									}
+									break;
+								case data[1].nouns[2]: //Box
+									if (localStorage.getItem('Light') == "on"){
+										$('#game').append("</br>Oh interesting I found a blabla" + $('#Noun').val());
+									}else{
+										$('#game').append("</br>Sorry I don't see any "+ $('#Noun').val());
+									}
+									break;
+								case data[1].nouns[6]: //Light
+
+									localStorage.setItem('Light', 'find');
+									$('#game').append("</br>Oh interesting you are really lucky I found the " + $('#Noun').val());
+									break;
+								default:
+									$('#game').append("</br>Sorry I don't undestand your noun");
+
+							}
+							break;
+						case data[1].verbs[6]: //read
+							$('#game').append("</br>One second, I took my glasses... It says : ");
+							break;
+						case data[1].verbs[7]: //move forward
+							$('#game').append("</br>Let's go Forward !");
+							break;
+						case data[1].verbs[8]: //move backward
+							$('#game').append("</br>Half tour !");
+							break;
+						case data[1].verbs[9]: //switch on
+							if(localStorage.getItem('Light') == "find"){
+								localStorage.setItem('Light', 'on');
+								$('#game').append("</br>Perfect I see correctly now !");
+							}else{
+									$('#game').append('</br>Sorry but I don\'t know where the light is ... ');
+							}
+							break;
+						case data[1].verbs[10]: //switch off
+							if(localStorage.getItem('Light') == "find"){
+								localStorage.setItem('Light', 'off');
+								$('#game').append("</br>Oh we don't see anything now !");
+							}else{
+									$('#game').append('</br>Sorry but I don\'t know where the light is ... ');
+							}
+							break;
+						default:
+							$('#game').append("</br>Sorry I don't undestand your verb");
+
+					}
+
+				$('#Verb').val('');
+				$('#Noun').val('');
+
+				});
 
 
+			});
+
+	});
 });
 
 </script>

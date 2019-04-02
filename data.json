@@ -7,5 +7,26 @@
       "Poudlard"
     ],
     "score" : 0
+  },
+  {
+    "verbs": ["DESCRIBE","SAY","TAKE","USE","OPEN","FIND","READ","MOVE FORWARD","MOVE BACKWARD", "SWITCH ON", "SWITCH OFF"],
+    "nouns":["ROOM","WAND","BOX","KEY","DOOR","BOOK", "LIGHT", "PAINTING"]
+  },
+  {
+    "Poudlard_description" : "</br>You are in a bigest room of the castle, it seems to be in a classroom, I see lot's of painting on the wall, I see one door behind you but I can't see the bottom of the room the light is off. There are tables with teaching books, papers and potions",
+    "Wand_description" : [
+        "</br>This is a wand made of Alder wood with unicorn hair. Alder is an unyielding wood, yet I have discovered that its ideal owner is not stubborn or obstinate, but often helpful, considerate and most likeable. Unicorn hair generally produces the most consistent magic, and is least subject to fluctuations and blockages. Wands with unicorn cores are generally the most difficult to turn to the Dark Arts ",
+        "</br>This is a wand made of Alder wood with dragon heartstrings. A sensitive wand, hazel often reflects its owner’s emotional state and works best for a master who understands and can manage their own feelings. As a rule, dragon heartstrings produce wands with the most power, and which are capable of the most flamboyant spells"
+      ],
+    "Box" : "</br>This box is completely dark, it seems to be dangerous...",
+    "Key" : "</br>This is a simple key I think it can ... open a door",
+    "Door" : "</br>This a big brown door with a lock",
+    "Book" : [
+        "</br>Oh, this is the book of Potions",
+        "</br>Oh, this is the book of The History of Magic",
+        "</br>Oh, this is the book of Defence against the Dark Arts"
+      ],
+    "Light" : "</br>This is the Light of the end of the room",
+    "Painting" : "This is a painting of Gilderoy Lockhart, previous teacher of Defence against the Dark Arts but he was victim of a Obliviate spell"
   }
-];
+]
