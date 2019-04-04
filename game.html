@@ -99,7 +99,7 @@ $(document).ready( function() {
 					if (e.keyCode == 13){
 						mystorage[0].name = $('#userName').val().toUpperCase();
 						localStorage.setItem('mystorage', JSON.stringify(mystorage));
-						$('#character').html('Welcome to ' +  mystorage[0].rooms + " " + mystorage[0].name);
+						$('#character').html('</br></br>Welcome to ' +  mystorage[0].rooms + " " + mystorage[0].name);
 						$('#instructions').show();
 
 
@@ -528,9 +528,9 @@ $(document).ready( function() {
 			</div>
 			<div id ="instructions"  style="display: none">
 
-			</br></br></br></br>The game can start !! Instructions are simple : </br></br></br></br>
-		<p>	You are in one room of the game but there are other places and you have to undestand how you can go out ! </br></br>The goal is to understand your room in order to leave, the more you understand the more points you will have !! </br></br>
-			You can talk to Dumbledore with a simple combinaison of a <b>Noun</b> and a <b>Verb</b> that he can understand, Enjoy :)</br></br></p>
+			</br></br>The game can start !! Instructions are simple : </br></br>
+		<p>	You are in one room of the game but there are other places and you have to undestand how you can go out ! </br>The goal is to understand your room in order to leave, the more you understand the more points you will have !! </br>
+			You can talk to Dumbledore with a simple combinaison of a <b>Noun</b> and a <b>Verb</b> that he can understand, Enjoy :)</br></p>
 		<button type="button" id="understand">UNDERSTAND</button>
 
 
