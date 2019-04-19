@@ -23,7 +23,7 @@ $(document).ready( function() {
 		let test_storage;
 
 
-		if(JSON.parse(localStorage.getItem('text_test')) == null){ //If the player already played
+		if(JSON.parse(localStorage.getItem('text_test')) != null){ //If the player already played
 
 			$('#end').hide(); //End of the game
 			test_storage = JSON.parse(localStorage.getItem('text_test'));; //Previous storage of the game
