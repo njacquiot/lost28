@@ -80,14 +80,14 @@ app.post('/', function(req, res, next) {
 		});
 		if (r.length==0){ // no login in the db
 			res.send('Wrong combinaison  ' +
-				'<a href="http://localhost:3000/">Login page</a>' );
+				'<a href="https://lostv3.herokuapp.com">Login page</a>' );
 		} else {
 			let r2 = r.filter(e=>{
 				return req.body.password == e.password;
 			});
 			if(r2.length==0){ //wrong password
 				res.send('Wrong combinaison ' +
-					'<a href="http://localhost:3000/">back</a>' );
+					'<a href="https://lostv3.herokuapp.com/">back</a>' );
 			}else{ //Combinaison ok
 				//res.send('<a href="http://localhost:3000/game">game</a>');
         console.log('r2 : '+ r2[0])//io.emit('login', r2);
