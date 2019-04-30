@@ -1,6 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+const port=process.env.PORT || 3000;
 
 const express = require('express');
 const path = require('path');
@@ -163,6 +164,6 @@ io.on('connection', function(socket){
 
 //Démarrer seveur
 
-http.listen(3000, function(){
-  console.log('listening on port :3000');
+app.listen(port, function () {
+ console.log(`Example app listening on port !`);
 });
