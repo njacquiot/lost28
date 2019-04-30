@@ -11,23 +11,43 @@
 </style>
 
 <script src="/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 
 <script>
+
+function RedirectionJavascript(){
+	document.location.href="https://lostv3.herokuapp.com/";
+}
 
 $(document).ready( function() {
 	$.getJSON( "/data.json", function(data) {
 
-
 		//Game is on
 		let gameIsRunning = true;
 		let test_storage;
+		let user;
+
+		var socket = io();
+		//var person = prompt("Please enter your name");
+
+		//socket.emit('login2', 'on');
+		socket.on('user', function(msg){
+			user = msg;
+			console.log(user);
+
+		});
+
+		socket.on('login2', function(msg){
+			test_storage = msg;
+			console.log(test_storage[0].status[0].score);
+
+			$('#useVerb').html('<p>Verbs understandable by Dumbledore</p>');
+			$('#useNoun').html('<p>Nouns understandable by Dumbledore</p>');
+			$('#status').html('');
+			$('#end').hide();
 
 
-		if(JSON.parse(localStorage.getItem('text_test')) != null){ //If the player already played
 
-			$('#end').hide(); //End of the game
-			test_storage = JSON.parse(localStorage.getItem('text_test'));; //Previous storage of the game
-			console.log(test_storage);
 
 			//Status of the player's game
 			for(i = 0; i<data[1].verbs.length; i++){
@@ -46,13 +66,13 @@ $(document).ready( function() {
 				$('#useNoun').append("<li>"+test_storage[0].nouns[i]+"</li>");
 			}
 
-			$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ 	test_storage[0].status[0].score +"</b>");
-			$('#status').append( 'Your are in ' + test_storage[0].status[1].world + ' world');
-			$('#status').append('</br></br>You are now in the room ' + test_storage[0].status[2].room);
-			$('#character').hide();
+			$('#status').append( '</br>Your are in ' + test_storage[0].status[1].world  + ' world');
+			test_storage[0].status.push({room : data[0].rooms[2]});
+			$('#status').append('</br>Welcome to ' + test_storage[0].status[2].room  + " " + user+'</br>');
+
 			$('#instructions').show();
 
-
+			//Items of the player
 			if(test_storage[0].box[1] == 1){
 				$('#status').append('</br>You have a box in your object');
 			}if (test_storage[0].key[1] == 1) {
@@ -70,83 +90,9 @@ $(document).ready( function() {
 			}
 			$('#status').append('</br>The light of the end of the room is ' + test_storage[0].light);
 
-		}else { //If new user
-			//Begin storage
-			test_storage = [
-				{
-					status : [
-						{score : 0}
-					],
-					wand : [
-						"not find",
-						0
-					],
-					box : [
-						"not find",
-						0,
-					],
-					key : [
-						"not find",
-						0
-					],
-					book : [
-						"not find",
-						0
-					],
-					painting : "not find",
-					boggart : "lock",
-					light_switch : "not find",
-					light : "off",
-					verbs : [],
-					nouns : [],
-
-				}
-			];
-
-/***************************************************************** Initialization *****************************************************************************/
-
-				$('#end').hide(); //Hide End of the game
-
-				for(i = 0; i<data[1].verbs.length; i++){
-					$('#useVerb').append("<li>"+data[1].verbs[i]+"</li>");
-				}
-
-				for(i = 0; i<data[1].nouns.length; i++){
-					$('#useNoun').append("<li>"+data[1].nouns[i]+"</li>");
-				}
-
-				$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 
 
-				//One world and a random room to start
-				test_storage[0].status.push({world : data[0].world});
-				$('#status').append( 'Your are in ' + test_storage[0].status[1].world  + ' world');
-
-				let rand = Math.floor(Math.random()*3);
-				test_storage[0].status.push({room : data[0].rooms[2]});//TT le temps Poudlard pour l'instant
-				$('#status').append('</br></br>You are now in the room ' + test_storage[0].status[2].room);
-
-
-		}
-				//Confirm your character
-				$('#enterBtn').click( ()=>{
-					test_storage[0].status.push({name : $('#userName').val().toUpperCase()});
-					let text_test = JSON.stringify(test_storage);
-					localStorage.setItem('text_test', JSON.stringify(test_storage));
-					$('#character').html('Welcome to ' +  test_storage[0].status[2].room + " " + test_storage[0].status[3].name);
-					$('#instructions').show();
-				});
-
-				$('#userName').keyup(  function(e){
-					if (e.keyCode == 13){
-						test_storage[0].status.push({name : $('#userName').val().toUpperCase()});
-						let text_test = JSON.stringify(test_storage);
-						localStorage.setItem('text_test', JSON.stringify(test_storage));
-						$('#character').html('Welcome to ' +  test_storage[0].status[2].room + " " + test_storage[0].status[3].name);
-						$('#instructions').show();
-
-					}
-				});
+		});
 
 /***************************************************************** Starting GAME *****************************************************************************/
 
@@ -154,30 +100,49 @@ $(document).ready( function() {
 
 					$('#understand').hide();
 
-					$("#dumbledore").append("Hello " + test_storage[0].status[3].name + ", I'm Dumbledore nice to meet you. " + test_storage[0].status[2].room + " is a huge place, hope you won't be lost ! How can I help you ?");
+					$("#dumbledore").append("Hello " + user + ", I'm Dumbledore nice to meet you. " + test_storage[0].status[2].room + " is a huge place, hope you won't be lost ! How can I help you ?");
 					$('#questions').show();
 
-					$("#send").click( ()=>{
+					$("#send").click( (e)=>{
+						e.preventDefault(); // prevents page reloading
+						console.log($('#Noun').val().toUpperCase());
+
+						socket.emit('question', {verb : $('#Verb').val().toUpperCase(), noun : $('#Noun').val().toUpperCase()});
+					});
+
+					$("#quit").click( (e)=>{
+						e.preventDefault(); // prevents page reloading
+						socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
+						RedirectionJavascript();
+					});
+
+
+					socket.on('answer', function(msg){
+
+
 
 						//Scroll down auto
 						$([document.documentElement, document.body]).animate({
-				        scrollTop: $("#send").offset().top
-				    }, 2000);
+								scrollTop: $("#send").offset().top
+						}, 2000);
+
+
 
 /***************************************************************** SWITCH CASE FOR THE VERBS + NOUNS *****************************************************************************/
-						switch ($('#Verb').val().toUpperCase()) {
+						switch (msg.verb) {
 
 /***************************************************************** DESCRIBE *****************************************************************************/
 
 
 							case data[1].verbs[0]:
+								console.log("fois");
 								$('#game').append("</br></br>Well, I will tell you what I see !");
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 
 									case data[1].nouns[0]: //Room
 										if(test_storage[0].light == "on"){
 											test_storage[0].status[0].score += 100;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 											$('#game').append(data[2].Poudlard_description[1]);
 										}else{
@@ -240,7 +205,7 @@ $(document).ready( function() {
 /***************************************************************** SAY *****************************************************************************/
 
 							case data[1].verbs[1]:
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 
 									case "ALOHOMORA":
 										if(test_storage[0].box[1] == 1 && test_storage[0].wand[1] == 1){
@@ -248,7 +213,7 @@ $(document).ready( function() {
 											$('#game').append("</br></br>Wow it works you have open the box... OMG this is a... a Boggart, you have to fight ! Hope you know how to win");
 											test_storage[0].status[0].score += 100;
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 										}else{
 											$('#game').append("</br></br>"+$('#Noun').val() + "  Mmmh nothing happened");
 										}
@@ -260,7 +225,7 @@ $(document).ready( function() {
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 											$('#game').append("</br></br>Ahahahaha It's a clown now :D Oh he gives you a key, you should take it");
 											test_storage[0].key[0] = "find";
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 										}else{
 												$('#game').append($('#Noun').val().toUpperCase() + " Mmmh nothing happened");
 										}
@@ -274,7 +239,7 @@ $(document).ready( function() {
 										$('#game').append(data[2].Lockhart);
 										$('#game').append("</br></br><b>You unlock the new Verb ACCIO</b>");
 										$('#useVerb').append("<li>"+ test_storage[0].verbs[0] + "</li>");
-										localStorage.setItem('text_test', JSON.stringify(test_storage));
+										socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 
 									} else { //If we didn't find the painting
 										$('#game').append("</br></br>"+$('#Noun').val().toUpperCase());
@@ -287,7 +252,7 @@ $(document).ready( function() {
 							case "ACCIO" :
 								let best_rand = Math.floor(Math.random()*2);
 								console.log(best_rand);
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 									case data[1].nouns[1]: //Wand
 
 										if(best_rand == 1){
@@ -295,7 +260,7 @@ $(document).ready( function() {
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 											$('#game').append("</br></br>Oh interesting you are really lucky I found a " + $('#Noun').val() + " You should take it !!");
 											test_storage[0].wand[0] = "find";
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#game').append(data[2].Wand_description[0]);
 										}else{
 											$('#game').append("</br></br>Sorry I didn't find any wand");
@@ -311,16 +276,14 @@ $(document).ready( function() {
 
 
 							case data[1].verbs[2]:
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 
 									case data[1].nouns[1] : //wand
 										if(	test_storage[0].wand[0] == "find"){
 
 											test_storage[0].wand[1] = 1;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 
-											//test_storage[0].wand1[1] = 1;
-											//localStorage.setItem('mystorage', JSON.stringify(mystorage));
 											$('#game').append("</br></br>Alright I took the "+ $('#Noun').val() + ", you can use it whenever you want");
 										}else{
 											$('#game').append("</br></br>I don't know if there is a wand here ...");
@@ -330,7 +293,7 @@ $(document).ready( function() {
 									case data[1].nouns[2]: //Box
 										if(test_storage[0].box[0] == "find"){
 											test_storage[0].box[1] = 1;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#game').append("</br></br>Alright I took the "+ $('#Noun').val() + ", you can use it whenever you want");
 										}else{
 											$('#game').append("</br></br>I don't know where the box is .. ");
@@ -343,7 +306,7 @@ $(document).ready( function() {
 											$('#game').append("</br></br>Alright I took the "+ $('#Noun').val() + ", you can use it whenever you want");
 											test_storage[0].status[0].score += 50;
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 										}else{
 											$('#game').append("</br></br>I don't know where the key is .. ");
 										}
@@ -353,7 +316,7 @@ $(document).ready( function() {
 										if(test_storage[0].book[0] == "find"){
 											test_storage[0].status[0].score += 10;
 											test_storage[0].book[1] = 1;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 											$('#game').append("</br></br>Alright I took the "+ $('#Noun').val() + ", you can use it whenever you want");
 										}else{
@@ -366,7 +329,7 @@ $(document).ready( function() {
 /***************************************************************** OPEN *****************************************************************************/
 
 							case data[1].verbs[3]:
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 
 									case data[1].nouns[2]: //Box
 										if(test_storage[0].box[1] == 1){
@@ -382,7 +345,7 @@ $(document).ready( function() {
 /***************************************************************** EXIT OF THE ROOM *****************************************************************************/
 
 											test_storage[0].status[0].score += 1000;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 											$('#game').append("</br></br><b>You did it !!!! Congratulation you figure out how to leave the room, see you in another world :)</b>");
 											$('#send').hide();
@@ -410,14 +373,14 @@ $(document).ready( function() {
 
 								let rand = Math.floor(Math.random()*4); // 1/4 if no accio for find wand
 
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 
 									case data[1].nouns[1]: //Wand
 										if(rand == 1){
 											if(test_storage[0].wand[0] == "not find"){
 												test_storage[0].wand[0] = "find";
 												test_storage[0].status[0].score += 100;
-												localStorage.setItem('text_test', JSON.stringify(test_storage));
+												socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 												$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 												$('#game').append("</br></br>Oh interesting you are really lucky I found a " + $('#Noun').val() + " You should take it !!");
 												$('#game').append(data[2].Wand_description[0]);
@@ -432,7 +395,7 @@ $(document).ready( function() {
 											test_storage[0].box[0] = "find";
 											test_storage[0].status[0].score += 10;
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#game').append("</br></br>Oh interesting I found a " + $('#Noun').val()+ " You should take it !!");
 										}else{
 											$('#game').append("</br></br>Sorry I don't see any "+ $('#Noun').val());
@@ -451,7 +414,7 @@ $(document).ready( function() {
 										if(test_storage[0].book[0] == "not find"){
 											test_storage[0].book[0] = "find";
 											test_storage[0].status[0].score += 10;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 										}
 										$('#game').append(data[2].Book[1]);
@@ -462,7 +425,7 @@ $(document).ready( function() {
 										if(test_storage[0].painting == "not find"){
 											test_storage[0].painting = "find";
 											test_storage[0].status[0].score += 10;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 										}
 										$('#game').append("</br></br>I'm in front of the painting do you want to say something ?");
@@ -472,7 +435,7 @@ $(document).ready( function() {
 										if(test_storage[0].light_switch == "not find"){
 											test_storage[0].light_switch = "find";
 											test_storage[0].status[0].score += 10;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 										}
 										$('#game').append("</br></br>Oh interesting you are really lucky I found the " + $('#Noun').val());
@@ -488,7 +451,7 @@ $(document).ready( function() {
 
 
 							case data[1].verbs[5]: //Book
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 									case data[1].nouns[5]:
 									if(test_storage[0].book[1] == 1 && test_storage[0].book[0] == "find"){
 										test_storage[0].book[0] = "read";
@@ -501,7 +464,7 @@ $(document).ready( function() {
 											test_storage[0].nouns.push("RIDICULOUS");
 											$('#useNoun').append("<li>ALOHOMORA</li>");
 											$('#useNoun').append("<li>RIDICULOUS</li>");
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 
 									}else if (test_storage[0].book[0] == "read"){
 										$('#game').append("</br></br>One second, I took my glasses... It says : " + data[2].Book[2]);
@@ -519,13 +482,13 @@ $(document).ready( function() {
 
 
 							case data[1].verbs[6]:
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 
 									case data[1].nouns[6]: //Light
 										if(test_storage[0].light_switch == "find"){
 											test_storage[0].light = "on";
 											test_storage[0].status[0].score += 100;
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#Score').html("<p><b>Your Score</b></p></br></br><b>"+ test_storage[0].status[0].score +"</b>");
 											$('#game').append("</br></br>Perfect I see correctly now !");
 										}else{
@@ -542,12 +505,12 @@ $(document).ready( function() {
 
 
 							case data[1].verbs[7]:
-								switch ($('#Noun').val().toUpperCase()) {
+								switch (msg.noun) {
 
 									case data[1].nouns[6]: //Light
 										if(test_storage[0].light_switch == "find"){
 											test_storage[0].light = "off";
-											localStorage.setItem('text_test', JSON.stringify(test_storage));
+											socket.emit('maj', {login : user, storage : JSON.stringify(test_storage)});
 											$('#game').append("</br></br>Oh we don't see anything now !");
 										}else{
 												$('#game').append('</br></br>Sorry but I don\'t know where the light is ... ');
@@ -564,9 +527,9 @@ $(document).ready( function() {
 					//Verb and noun value empty after press
 					$('#Verb').val('');
 					$('#Noun').val('');
+					return false;
 
 					});
-
 
 				});
 
@@ -606,14 +569,10 @@ $(document).ready( function() {
 		    <p>Welcome to the game</p>
 				<div id ="status"></div>
 
-			<div id = "character">
-				<p>You can now enter your name</p>
-				<input type="text" id="userName"></input>
-				<button type="button" id="enterBtn">ENTER</button>
-			</div>
+
 			<div id ="instructions"  style="display: none">
 
-			</br></br>The game can start !! Instructions are simple : </br></br>
+			</br></br>The game is on !! Instructions are simple : </br></br>
 		<p>	You are in one room of the game but there are other places and you have to undestand how you can go out ! </br>The goal is to understand your room in order to leave, the more you understand the more points you will have !! </br>
 			You can talk to Dumbledore with a simple combinaison of a <b>Noun</b> and a <b>Verb</b> that he can understand, Enjoy :)</br></p>
 		<button type="button" id="understand">PLAY</button>
@@ -638,6 +597,9 @@ $(document).ready( function() {
 				<input id ="Verb" type ="text" placeholder="Verb"/>
 				<input id ="Noun" type="text" placeholder="Noun"/>
 				<button id ="send">Send</button>
+				</br>
+				</br>
+				<button id = "quit">Quit Game</button>
 				<button id ="end">Finish</button>
 				</div>
 			</div>

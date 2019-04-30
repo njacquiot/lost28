@@ -2,6 +2,12 @@ module.exports = function(app) {
 
 	app.get('/', function(req, res) {
 		// Send a plain text response
+		res.sendFile('login.html' , { root : __dirname});
+	});
+
+
+	app.get('/', function(req, res) {
+		// Send a plain text response
 		res.sendFile('game.html' , { root : __dirname});
 	});
 
@@ -15,6 +21,7 @@ module.exports = function(app) {
 		res.sendFile('data.json' , { root : __dirname});
 		console.log("found");
 	});
+
 
 
 };
