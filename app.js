@@ -108,7 +108,7 @@ app.post('/', function(req, res, next) {
 		if (r.length==0){ // unique userName
 			myData.push({'login': req.body.new_login, 'password': req.body.new_password, 'storage': test_storage});
 			res.send('You are now in the database and you can login now ' +
-				'<a href="http://localhost:3000/">back</a>' );
+				'<a href="https://lost28.herokuapp.com/">back</a>' );
 
 			fs.writeFile('database.json', JSON.stringify(myData) ,  function(err) {
 				if (err) {
